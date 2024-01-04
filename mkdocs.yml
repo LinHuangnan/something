@@ -1,3 +1,25 @@
-site_name: My Docs
+site_name: huangnan.lin DevZone
 theme:
   name: material
+  features: 
+    - navigation.instant
+    - navigation.tabs
+    - navigation.indexes
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+mkdocs.yml[+] [dos] (19:56 03/01/2024)                                   5,3 All
+-- INSERT --
+
