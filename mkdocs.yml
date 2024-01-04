@@ -5,21 +5,41 @@ theme:
     - navigation.instant
     - navigation.tabs
     - navigation.indexes
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-mkdocs.yml[+] [dos] (19:56 03/01/2024)                                   5,3 All
--- INSERT --
+    - navigation.tabs.sticky
+    - navigation.sections
+  
+markdown_extensions:
+  - toc:
+      permalink: true
+      toc_depth: "2-4"
+      slugify: !!python/name:pymdownx.slugs.uslugify
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - def_list
 
+
+nav:
+  - Home: index.md
+  - CS_BASIC: 
+    - Overview: cs_basic/index.md
+    - Shell: cs_basic/shell.md
+    - Shell Tools and Scripting: cs_basic/Shell_Tools_and_Scripting.md
+    - Editors:vim: cs_basic/Editors_vim.md
+    - Data Wrangling: cs_basic/Data_Wrangling.md
+    - Command Line Environment: cs_basic/Command-line-Environment.md
+    - Version Control and Git: cs_basic/Version_Control.md
+    - Debugging and Profiling: cs_basic/Debugging_and_Profiling.md
+    - Metaprogramming: cs_basic/Metaprogramming.md
+    - Security and Cryptography: cs_basic/Security_and_Cryptography.md
+    - Others: cs_basic/Others.md
+  - CPP_ADVANCE:
+    - Overview: cpp_advance/index.md
+  - QUADROTOR_BASIC:
+    - Overview: quadrotor_basic/index.md
