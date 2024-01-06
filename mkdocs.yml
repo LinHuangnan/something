@@ -43,8 +43,26 @@ nav:
     - Others: cs_basic/Others.md
   - CPP_ADVANCE:
     - Overview: cpp_advance/index.md
-  - QUADROTOR_BASIC:
+    - Types and Structs: cpp_advance/Types_and_Structs.md
+    - Initialization and References: cpp_advance/Initialization_and_References.md
+    - Streams: cpp_advance/Streams.md
+    - Containers: cpp_advance/Containers.md
+    - Iterators and Pointers: cpp_advance/Iterators_and_Pointers.md
+    - Classes: cpp_advance/Classes.md
+    - Template Classes and Const Correctness: cpp_advance/Template_Classes_and_Const_Correctness.md
+    - Template Functions: cpp_advance/Template_Functions.md
+    - Functions and Lambdas: cpp_advance/Functions_and_Lambdas.md
+    - Special Member Functions: cpp_advance/Special_Member_Functions.md
+    - Move Semantics: cpp_advance/Move_Semantics.md
+    - std::optional and Type Safety: cpp_advance/Optional_and_Type_Safety.md
+    - RAII, Smart Pointers, and Building C++ Projects: cpp_advance/RAll_Smart_Pointers_and_Building_Cpp_Projects.md
+  - QUADROTOR_BASIC: 
     - Overview: quadrotor_basic/index.md
+  - FPGA: 
+    - Overview: fpga/index.md
+    - Something about FPGA: fpga/something_about_fpga.md
+  - WIRELESS_COMMUNICATION: 
+    - Overview: wireless_communication/index.md
 
 extra:
   generator: false
