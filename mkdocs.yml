@@ -17,6 +17,8 @@ markdown_extensions:
       slugify: !!python/name:pymdownx.slugs.uslugify
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.arithmatex:
+      generic: true
   - admonition
   - pymdownx.details
   - pymdownx.superfences
@@ -25,6 +27,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.highlight
   - def_list
+
 
 
 nav:
@@ -76,3 +79,8 @@ copyright: Copyright &copy; 2020 - 2024 huangnan.lin
 plugins:
   - search
   - git-authors
+
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
