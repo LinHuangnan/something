@@ -1,12 +1,14 @@
 site_name: huangnan.lin DevZone
 theme:
   name: material
+  custom_dir: custom_theme
   features: 
     - navigation.instant
     - navigation.tabs
     - navigation.indexes
     - navigation.tabs.sticky
     - navigation.sections
+    - header.autohide
   
 markdown_extensions:
   - toc:
@@ -43,3 +45,16 @@ nav:
     - Overview: cpp_advance/index.md
   - QUADROTOR_BASIC:
     - Overview: quadrotor_basic/index.md
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/LinHuangnan/something
+      name: From that day on, if I was going somewhere, I was running.
+      
+copyright: Copyright &copy; 2020 - 2024 huangnan.lin
+
+plugins:
+  - search
+  - git-authors

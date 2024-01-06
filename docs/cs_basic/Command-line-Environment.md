@@ -1,4 +1,10 @@
 # 命令行环境
+- [ ] Version
+    * [x] huangnan.lin
+    * [x] 2023-12-15 
+    * [x] learning command line environment
+    * [ ] review
+
 !!! info
     * 同时执行多个不同的进程并追踪它们的状态
     * 停止或暂停某个进程以及如何使进程在后台运行
