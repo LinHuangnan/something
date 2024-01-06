@@ -90,3 +90,16 @@ for _ in range(100):
         logger.critical("Maximum value reached")
     time.sleep(0.3)
 ```
+
+`ls` 和 `grep` 这样的程序会使用 `ANSI escape codes`，它是一系列的特殊字符，可以使 `shell` 改变输出结果的颜色。例如，执行 `echo -e "\e[38;2;255;0;0mThis is red\e[0m"` 会打印红色的字符串：This is red 。
+!!! example
+    ```sh
+        #!/usr/bin/env bash
+        for R in $(seq 0 20 255); do
+            for G in $(seq 0 20 255); do
+                for B in $(seq 0 20 255); do
+                    printf "\e[38;2;${R};${G};${B}m█\e[0m";
+                done
+            done
+        done
+    ```
