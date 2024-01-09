@@ -28,6 +28,7 @@
     * [x] [Command Line Environment](cs_basic/Command-line-Environment.md)
     * [x] [Version Control and Git](cs_basic/Version_Control.md)
     * [x] [Git branch](cs_basic/git_branch.md)
+    * [x] [Git rebase](cs_basic/git_rebase.md)
     * [x] [Debugging and Profiling](cs_basic/Debugging_and_Profiling.md)
     * [ ] [Metaprogramming](cs_basic/Metaprogramming.md)
     * [ ] [Security and Cryptography](cs_basic/Security_and_Cryptography.md)

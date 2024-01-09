@@ -40,7 +40,8 @@ nav:
     - Data Wrangling: cs_basic/Data_Wrangling.md
     - Command Line Environment: cs_basic/Command-line-Environment.md
     - Version Control and Git: cs_basic/Version_Control.md
-    - Git Branch: cs_basic/git_branch.md
+    - Git Branch: cs_basic/git_branch.md  
+    - Git Rebase: cs_basic/git_rebase.md
     - Debugging and Profiling: cs_basic/Debugging_and_Profiling.md
     - Metaprogramming: cs_basic/Metaprogramming.md
     - Security and Cryptography: cs_basic/Security_and_Cryptography.md
