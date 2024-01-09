@@ -260,6 +260,10 @@ Git 处理这些场景的方法是使用一种叫做 “暂存区（staging area
     使用 git fetch 的好处是，你可以在合并之前先审查或测试远程分支上的改动，这给你提供了更多控制性和灵活性。
 
 `git pull`: 相当于 `git fetch`; `git merge`
+!!! example
+    `git pull origin feature-branch` 相当于**git fetch**  origin的feature-branch的更新，然后**git merge** 到本地仓库的当前所在分支
+
+    **git pull**其实也只是更新了当前分支，并不是整个本地仓库
 
 `git clone`: 从远端下载仓库
 

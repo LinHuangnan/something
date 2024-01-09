@@ -40,6 +40,7 @@ nav:
     - Data Wrangling: cs_basic/Data_Wrangling.md
     - Command Line Environment: cs_basic/Command-line-Environment.md
     - Version Control and Git: cs_basic/Version_Control.md
+    - Git Branch: cs_basic/git_branch.md
     - Debugging and Profiling: cs_basic/Debugging_and_Profiling.md
     - Metaprogramming: cs_basic/Metaprogramming.md
     - Security and Cryptography: cs_basic/Security_and_Cryptography.md
@@ -63,9 +64,27 @@ nav:
     - Overview: quadrotor_basic/index.md
   - FPGA: 
     - Overview: fpga/index.md
-    - Something about FPGA: fpga/something_about_fpga.md
+    - 深入理解FPGA结构: fpga/something_about_fpga.md
+    - 数字芯片设计---握手与反压: fpga/handshake.md
+    - Clock Domain Crossing(1) 亚稳态: fpga/cdc1.md
+    - Clock Domain Crossing(2) 打两拍: fpga/cdc2.md
+    - Clock Domain Crossing(3) 寄存器处理输出端口: fpga/cdc3.md
+    - Clock Domain Crossing(4) 快时钟到慢时钟数据传输: fpga/cdc4.md
+    - Clock Domain Crossing(5) 多信号跨时钟域传输: fpga/cdc5.md
   - WIRELESS_COMMUNICATION: 
     - Overview: wireless_communication/index.md
+  - HANDSHAKE_PROTOCOL:
+    - Overview: handshake_protocol/index.md
+    - valid-ready握手协议的介绍与时序说明: handshake_protocol/h1.md
+    - valid-ready接口与enable-xoff/bp接口的对比: handshake_protocol/h2.md
+    - 握手协议中常用的并发断言介绍: handshake_protocol/h3.md
+    - valid时序优化即forward打拍介绍: handshake_protocol/h4.md
+    - ready时序优化即backward打拍介绍: handshake_protocol/h5.md
+    - 同步fifo的握手协议适配: handshake_protocol/h6.md
+    - 双向时序优化即forward-backward打拍的两种方式介绍: handshake_protocol/h7.md
+    - 多路握手协议的融合场景与RTL编写: handshake_protocol/h8.md
+    - 多路握手协议的拆分场景与RTL编写: handshake_protocol/h9.md
+    - 应用于握手型接口的agent自动生成工具: handshake_protocol/h10.md
 
 extra:
   generator: false

@@ -8,6 +8,7 @@
 | `Part4`       | [数据整理](Data_Wrangling.md)  |
 | `Part5`       | [命令行环境](Command-line-Environment.md) |
 | `Part6`    | [版本控制(Git)](Version_Control.md) |
+| `Part6plus`    | [Git分支](git_branch.md) |
 | `Part7`       | [调试及性能分析](Debugging_and_Profiling.md)  |
 | `Part8`       |  [元编程](Metaprogramming.md) |
 | `Part9`    | [安全和密码学](Security_and_Cryptography.md)|
