@@ -4,6 +4,7 @@
 - [ ] [FPGA相关(FPGA)](fpga/index.md)
     * [x] [深入理解FPGA结构](fpga/something_about_fpga.md)
     * [x] [数字芯片设计---握手与反压](fpga/handshake.md)
+    * [x] [FPGA设计的“打拍（寄存）”和“亚稳态”](fpga/pipelining.md)
     * [x] [Clock Domain Crossing(1) 亚稳态](fpga/cdc1.md)
     * [x] [Clock Domain Crossing(2) 打两拍](fpga/cdc2.md)
     * [x] [Clock Domain Crossing(3) 寄存器处理输出端口](fpga/cdc3.md)
