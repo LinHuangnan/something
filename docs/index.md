@@ -50,3 +50,7 @@
     * [ ] [13. RAII, Smart Pointers, and Building C++ Projects](cpp_advance/RAll_Smart_Pointers_and_Building_Cpp_Projects.md)
 - [ ] [无线通信相关(WIRELESS_COMMUNCATION)](wireless_communication/index.md)
     * [ ] To be continued
+- [ ] [正点原子FPGA(learn_intel_fpga)](learn_intel_fpga/index.md)
+    * [x] [Testbench文件的书写](learn_intel_fpga/testbench.md)
+    * [x] [Modelsim手动仿真](learn_intel_fpga/modelsim1.md)
+    * [x] [Modelsim联合仿真](learn_intel_fpga/modelsim2.md)

@@ -87,7 +87,11 @@ nav:
     - 多路握手协议的融合场景与RTL编写: handshake_protocol/h8.md
     - 多路握手协议的拆分场景与RTL编写: handshake_protocol/h9.md
     - 应用于握手型接口的agent自动生成工具: handshake_protocol/h10.md
-
+  - LEARN_INTEL_FPGA:
+    - Testbench文件的书写: learn_intel_fpga/testbench.md
+    - Modelsim手动仿真: learn_intel_fpga/modelsim1.md
+    - Modelsim联合仿真: learn_intel_fpga/modelsim2.md
+    
 extra:
   generator: false
   social:
