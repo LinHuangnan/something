@@ -73,6 +73,8 @@ nav:
     - Clock Domain Crossing(3) 寄存器处理输出端口: fpga/cdc3.md
     - Clock Domain Crossing(4) 快时钟到慢时钟数据传输: fpga/cdc4.md
     - Clock Domain Crossing(5) 多信号跨时钟域传输: fpga/cdc5.md
+    - 单端口和双端口RAM: fpga/ram.md
+    - 脉动阵列: fpga/pe.md
   - WIRELESS_COMMUNICATION: 
     - Overview: wireless_communication/index.md
   - HANDSHAKE_PROTOCOL:

@@ -10,6 +10,8 @@
     * [x] [Clock Domain Crossing(3) 寄存器处理输出端口](fpga/cdc3.md)
     * [x] [Clock Domain Crossing(4) 快时钟到慢时钟数据传输](fpga/cdc4.md)
     * [x] [Clock Domain Crossing(5) 多信号跨时钟域传输](fpga/cdc5.md)
+    * [x] [单端口和双端口RAM](fpga/ram.md)
+    * [x] [脉动阵列](fpga/pe.md)
 - [ ] [【数字IC握手协议总结】(HANDSHAKE_PROTOCOL)](fpga/index.md)
     * [x] [【握手协议】valid-ready握手协议的介绍与时序说明](handshake_protocol/h1.md)
     * [x] [【握手协议】valid-ready接口与enable-xoff/bp接口的对比](handshake_protocol/h2.md)
@@ -50,7 +52,7 @@
     * [ ] [13. RAII, Smart Pointers, and Building C++ Projects](cpp_advance/RAll_Smart_Pointers_and_Building_Cpp_Projects.md)
 - [ ] [无线通信相关(WIRELESS_COMMUNCATION)](wireless_communication/index.md)
     * [ ] To be continued
-- [ ] [正点原子FPGA(learn_intel_fpga)](learn_intel_fpga/index.md)
+- [ ] [正点原子FPGA(LEARN_INTEL_FPGA)](learn_intel_fpga/index.md)
     * [x] [Testbench文件的书写](learn_intel_fpga/testbench.md)
     * [x] [Modelsim手动仿真](learn_intel_fpga/modelsim1.md)
     * [x] [Modelsim联合仿真](learn_intel_fpga/modelsim2.md)
