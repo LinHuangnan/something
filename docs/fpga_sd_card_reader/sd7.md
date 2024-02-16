@@ -447,7 +447,8 @@ always @(posedge clk_ref or negedge rst_n) begin
                 end                                            
             end   
             4'd1 : begin //开始按位发送写命令，并且接收
-                if(cmd_bit_cnt <= 6'd47) begin             
+                if(cmd_bit_cnt <= 6'd47) begin  
+                    //注意，这几条指令是并行执行的，因此计数器先加1并没有影响           
                     cmd_bit_cnt <= cmd_bit_cnt + 6'd1;
                     sd_cs <= 1'b0;
                     sd_mosi <= cmd_wr[6'd47 - cmd_bit_cnt]; //先发送高字节                 
