@@ -56,3 +56,12 @@
     * [x] [Testbench文件的书写](learn_intel_fpga/testbench.md)
     * [x] [Modelsim手动仿真](learn_intel_fpga/modelsim1.md)
     * [x] [Modelsim联合仿真](learn_intel_fpga/modelsim2.md)
+
+- [ ] [verilog读取SD卡(SD)](fpga_sd_card_reader/index.md)
+    * [x] [SD卡简介](fpga_sd_card_reader/sd1.md)
+    * [x] [SD卡常用命令](fpga_sd_card_reader/sd2.md)
+    * [x] [SPI接口与时序](fpga_sd_card_reader/sd3.md)
+    * [x] [SD卡的操作时序](fpga_sd_card_reader/sd4.md)
+    * [x] [SD卡读写测试实验程序框图](fpga_sd_card_reader/sd5.md)
+    * [x] [SD卡控制顶层模块RTL代码（sd_ctrl_top.v）](fpga_sd_card_reader/sd6.md)
+    * [x] [SD卡控制器模块RTL代码（sd_init.v、sd_read.v、sd_write.v）](fpga_sd_card_reader/sd7.md)
