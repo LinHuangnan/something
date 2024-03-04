@@ -408,6 +408,7 @@ always @(posedge clk_ref_180deg or negedge rst_n) begin
 end 
 
 //写完数据后检测SD卡是否空闲
+//检测MISO上的数据，假如是FFh，说明已经写入完成（因为MISO的busy信号是低电平）
 always @(posedge clk_ref or negedge rst_n) begin
     if(!rst_n)
         detect_data <= 8'd0;   
