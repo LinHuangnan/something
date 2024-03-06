@@ -103,3 +103,12 @@
 
 - [ ] [PIM](processing_in_memory/index.md)
     * [x] [存内计算综述(A_Modern_Primer_on_Processing_in_Memory)](processing_in_memory/A_Modern_Primer_on_Processing_in_Memory.md)
+
+- [ ] [IC_INTERVIEW](digital_ic_interview/index.md)
+    * [x] [FIFO深度计算](digital_ic_interview/01_fifo/fifo_depth.md)
+    * [x] [同步FIFO](digital_ic_interview/01_fifo/sync_fifo.md)
+    * [x] [异步FIFO](digital_ic_interview/01_fifo/async_fifo.md)
+    * [x] [竞争冒险](digital_ic_interview/02_RaceCondition_Metastability_Synchronization/race_condition.md)
+    * [x] [FPGA中亚稳态](digital_ic_interview/02_RaceCondition_Metastability_Synchronization/metastability.md)
+
+    
