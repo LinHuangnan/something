@@ -110,5 +110,11 @@
     * [x] [异步FIFO](digital_ic_interview/01_fifo/async_fifo.md)
     * [x] [竞争冒险](digital_ic_interview/02_RaceCondition_Metastability_Synchronization/race_condition.md)
     * [x] [FPGA中亚稳态](digital_ic_interview/02_RaceCondition_Metastability_Synchronization/metastability.md)
+    * [x] [复位相关](digital_ic_interview/02_RaceCondition_Metastability_Synchronization/reset.md)
+    * [x] [跨时钟域](digital_ic_interview/02_RaceCondition_Metastability_Synchronization/crc.md)
+    * [x] [数字IC设计流程](digital_ic_interview/03_Design_Flow/flow_and_tools.md)
+    * [x] [FPGA原型验证](digital_ic_interview/03_Design_Flow/FPGA_prototyping.md)
+    * [x] [CDC跨时钟域处理](digital_ic_interview/04_STA_Timing_Constraints/cdc.md)
+    * [x] [AXI4总线介绍](digital_ic_interview/05_AXI/intro.md)
 
-    
+        - : 
