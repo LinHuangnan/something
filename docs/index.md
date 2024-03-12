@@ -116,5 +116,5 @@
     * [x] [FPGA原型验证](digital_ic_interview/03_Design_Flow/FPGA_prototyping.md)
     * [x] [CDC跨时钟域处理](digital_ic_interview/04_STA_Timing_Constraints/cdc.md)
     * [x] [AXI4总线介绍](digital_ic_interview/05_AXI/intro.md)
-
-        - : 
+    * [x] [AXI4用实例介绍 5 个读写通道](digital_ic_interview/05_AXI/channels.md)
+    * [x] [自定义 AXI-Lite 接口的 IP 及源码分析](digital_ic_interview/05_AXI/axi_lite.md)
