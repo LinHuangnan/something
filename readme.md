@@ -120,3 +120,4 @@
     * [x] [AXI4总线介绍](digital_ic_interview/05_AXI/intro.md)
     * [x] [AXI4用实例介绍 5 个读写通道](digital_ic_interview/05_AXI/channels.md)
     * [x] [自定义 AXI-Lite 接口的 IP 及源码分析](digital_ic_interview/05_AXI/axi_lite.md)
+    * [x] [异步电路学习笔记](digital_ic_interview/async.md)
