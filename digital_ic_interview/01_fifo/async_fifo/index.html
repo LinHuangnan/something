@@ -1,0 +1,4594 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../sync_fifo/">
+      
+      
+        <link rel="next" href="../../02_RaceCondition_Metastability_Synchronization/race_condition/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+    
+    
+      
+        <title>异步FIFO - huangnan.lin DevZone</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.8608ea7d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#先从同步fifo说起" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+<div class="announcement-bar" style="color: white; padding: 10px; text-align: center; box-shadow: none; border: none;">
+  <p>🚀🚀🚀   Every journey has its end.I think you bring that out of me.         --2022.09   🚀🚀🚀<a href="https://linhuangnan.github.io/something/" style="color: #FFD700; font-weight: bold;">huangnan.lin</a></p>
+  <p>🚀🚀🚀   Wanna be a master of digital integrated circuit design.             --2023.07   🚀🚀🚀<a href="https://linhuangnan.github.io/something/" style="color: #FFD700; font-weight: bold;">huangnan.lin</a></p>
+  <p>🚀🚀🚀   In case I don't see you..Good morning,good evening,and good night.  --2023.12   🚀🚀🚀<a href="https://linhuangnan.github.io/something/" style="color: #FFD700; font-weight: bold;">huangnan.lin</a></p>
+  <p>🚀🚀🚀   2024 healthy and happy .Also Wanna be an expert marathon runner.    --2024.01   🚀🚀🚀 <a href="https://linhuangnan.github.io/something/" style="color: #FFD700; font-weight: bold;">huangnan.lin</a></p>
+</div>
+
+          </div>
+          
+        </aside>
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="huangnan.lin DevZone" class="md-header__button md-logo" aria-label="huangnan.lin DevZone" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            huangnan.lin DevZone
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              异步FIFO
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../cs_basic/" class="md-tabs__link">
+          
+  
+    
+  
+  CS_BASIC
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../cpp_advance/" class="md-tabs__link">
+          
+  
+    
+  
+  CPP_ADVANCE
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../quadrotor_basic/" class="md-tabs__link">
+          
+  
+    
+  
+  QUADROTOR_BASIC
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../fpga/" class="md-tabs__link">
+          
+  
+    
+  
+  FPGA
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../wireless_communication/" class="md-tabs__link">
+          
+  
+    
+  
+  WIRELESS_COMMUNICATION
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../handshake_protocol/" class="md-tabs__link">
+          
+  
+    
+  
+  HANDSHAKE_PROTOCOL
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../learn_intel_fpga/" class="md-tabs__link">
+          
+  
+    
+  
+  LEARN_INTEL_FPGA
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../fpga_sd_card_reader/" class="md-tabs__link">
+          
+  
+    
+  
+  SD_CARD_READER(VERILOG)
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../vivado/" class="md-tabs__link">
+          
+  
+    
+  
+  VIVADO
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../hls/" class="md-tabs__link">
+          
+  
+    
+  
+  HLS
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../soc_design/" class="md-tabs__link">
+          
+  
+    
+  
+  SOC_DESIGN
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../processing_in_memory/" class="md-tabs__link">
+          
+  
+    
+  
+  PIM
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+    
+  
+  IC_INTERVIEW
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="huangnan.lin DevZone" class="md-nav__button md-logo" aria-label="huangnan.lin DevZone" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    huangnan.lin DevZone
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../cs_basic/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    CS_BASIC
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            CS_BASIC
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/shell/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Shell
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Shell_Tools_and_Scripting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Shell Tools and Scripting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Editors_vim/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Editors:vim
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Data_Wrangling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Wrangling
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Command-line-Environment/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Command Line Environment
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Version_Control/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Version Control and Git
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/git_branch/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Git Branch
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/git_rebase/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Git Rebase
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Debugging_and_Profiling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Debugging and Profiling
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Metaprogramming/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Metaprogramming
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Security_and_Cryptography/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Security and Cryptography
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cs_basic/Others/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Others
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../cpp_advance/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    CPP_ADVANCE
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            CPP_ADVANCE
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Types_and_Structs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Types and Structs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Initialization_and_References/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Initialization and References
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Streams/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Streams
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Containers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Containers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Iterators_and_Pointers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Iterators and Pointers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Classes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Template_Classes_and_Const_Correctness/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Template Classes and Const Correctness
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Template_Functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Template Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Functions_and_Lambdas/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Functions and Lambdas
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Special_Member_Functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Special Member Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Move_Semantics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Move Semantics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/Optional_and_Type_Safety/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    std::optional and Type Safety
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cpp_advance/RAll_Smart_Pointers_and_Building_Cpp_Projects/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RAII, Smart Pointers, and Building C++ Projects
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../quadrotor_basic/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    QUADROTOR_BASIC
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            QUADROTOR_BASIC
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../fpga/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    FPGA
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            FPGA
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/something_about_fpga/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    深入理解FPGA结构
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/handshake/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    数字芯片设计---握手与反压
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/pipelining/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FPGA设计的“打拍(寄存)”和“亚稳态”
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/cdc1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Clock Domain Crossing(1) 亚稳态
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/cdc2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Clock Domain Crossing(2) 打两拍
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/cdc3/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Clock Domain Crossing(3) 寄存器处理输出端口
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/cdc4/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Clock Domain Crossing(4) 快时钟到慢时钟数据传输
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/cdc5/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Clock Domain Crossing(5) 多信号跨时钟域传输
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/ram/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    单端口和双端口RAM
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga/pe/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    脉动阵列
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../wireless_communication/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    WIRELESS_COMMUNICATION
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            WIRELESS_COMMUNICATION
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../handshake_protocol/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    HANDSHAKE_PROTOCOL
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            HANDSHAKE_PROTOCOL
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    valid-ready握手协议的介绍与时序说明
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    valid-ready接口与enable-xoff/bp接口的对比
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h3/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    握手协议中常用的并发断言介绍
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h4/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    valid时序优化即forward打拍介绍
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h5/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ready时序优化即backward打拍介绍
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h6/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    同步fifo的握手协议适配
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h7/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    双向时序优化即forward-backward打拍的两种方式介绍
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h8/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    多路握手协议的融合场景与RTL编写
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h9/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    多路握手协议的拆分场景与RTL编写
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handshake_protocol/h10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    应用于握手型接口的agent自动生成工具
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../learn_intel_fpga/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    LEARN_INTEL_FPGA
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            LEARN_INTEL_FPGA
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../learn_intel_fpga/testbench/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Testbench文件的书写
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../learn_intel_fpga/modelsim1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelsim手动仿真
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../learn_intel_fpga/modelsim2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelsim联合仿真
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../fpga_sd_card_reader/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    SD_CARD_READER(VERILOG)
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            SD_CARD_READER(VERILOG)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga_sd_card_reader/sd1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SD卡简介
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga_sd_card_reader/sd2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SD卡常用命令
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga_sd_card_reader/sd3/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SPI接口与时序
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga_sd_card_reader/sd4/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SD卡的操作时序
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga_sd_card_reader/sd5/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SD读写测试实验模块框图
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga_sd_card_reader/sd6/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SD卡控制顶层模块RTL代码(sd_ctrl_top.v)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../fpga_sd_card_reader/sd7/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SD卡控制器模块RTL代码(sd_init.v、sd_read.v、sd_write.v)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../vivado/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    VIVADO
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            VIVADO
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vivado/vivado1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vivado设计流程及使用模式
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vivado/vivado2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    如何在设计中使用IP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vivado/vivado3/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    基于XSim的逻辑仿真
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vivado/vivado4/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    基于ModelSim的逻辑仿真
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../hls/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    HLS
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            HLS
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    软件工程师应该如何理解FPGA架构
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HLS工作机制
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls3/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vivado HLS设计流程介绍
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls4/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vivado HLS设计流程Demo
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls5/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    如何处理任意精度的数据类型
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls6/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    数据类型的转换
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls7/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    了解HLS中的复合数据类型
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls8/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vivado HLS中的C++基本运算1
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls9/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vivado HLS中的C++基本运算2
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    描述高效的C测试平台-测试激励
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls11/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    描述高效的C测试平台-输出监测与格式控制
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls12/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    接口综合-基本介绍
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls13/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    接口综合-对数组的处理
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls14/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    接口综合-demo
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls15/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    for循环优化-基本性能指标
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls16/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    for循环优化-循环合并
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls17/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    for循环优化-数据流
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls18/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    for循环优化-嵌套的for循环
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls19/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    for循环优化-其它优化方法
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls20/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    数组优化-数组分割
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls21/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    数组优化-数组映射与重组
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls22/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    数组优化-其它优化方法
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls23/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vivado HLS函数层面的优化
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls24/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Demo
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hls/hls25.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    总结
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../soc_design/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    SOC_DESIGN
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            SOC_DESIGN
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../processing_in_memory/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    PIM
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            PIM
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../processing_in_memory/A_Modern_Primer_on_Processing_in_Memory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    存内计算综述(A_Modern_Primer_on_Processing_in_Memory)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    IC_INTERVIEW
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_14" id="__nav_14_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            IC_INTERVIEW
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fifo_depth/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FIFO深度计算
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sync_fifo/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    同步FIFO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    异步FIFO
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    异步FIFO
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#先从同步fifo说起" class="md-nav__link">
+    <span class="md-ellipsis">
+      先从同步FIFO说起
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#异步fifo介绍" class="md-nav__link">
+    <span class="md-ellipsis">
+      异步FIFO介绍
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#空满判断" class="md-nav__link">
+    <span class="md-ellipsis">
+      空满判断
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="空满判断">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#在同步fifo中怎么判断空满呢" class="md-nav__link">
+    <span class="md-ellipsis">
+      在同步FIFO中，怎么判断空满呢？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#在异步fifo中怎么判断空满呢" class="md-nav__link">
+    <span class="md-ellipsis">
+      在异步FIFO中，怎么判断空满呢？
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#跨时钟域问题" class="md-nav__link">
+    <span class="md-ellipsis">
+      跨时钟域问题
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#关于格雷码的转换" class="md-nav__link">
+    <span class="md-ellipsis">
+      关于格雷码的转换
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="关于格雷码的转换">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#二进制转格雷码" class="md-nav__link">
+    <span class="md-ellipsis">
+      二进制转格雷码
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#格雷码转二进制码" class="md-nav__link">
+    <span class="md-ellipsis">
+      格雷码转二进制码
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#代码实现异步fifo" class="md-nav__link">
+    <span class="md-ellipsis">
+      代码实现异步FIFO
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#几点思考" class="md-nav__link">
+    <span class="md-ellipsis">
+      几点思考
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#写在后面" class="md-nav__link">
+    <span class="md-ellipsis">
+      写在后面
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02_RaceCondition_Metastability_Synchronization/race_condition/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    竞争冒险
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02_RaceCondition_Metastability_Synchronization/metastability/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    亚稳态
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02_RaceCondition_Metastability_Synchronization/reset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    复位相关
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02_RaceCondition_Metastability_Synchronization/crc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    跨时钟域
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03_Design_Flow/flow_and_tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    数字IC设计流程
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03_Design_Flow/FPGA_prototyping/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FPGA原型验证
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04_STA_Timing_Constraints/cdc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CDC跨时钟域处理
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05_AXI/intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AXI4总线介绍
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05_AXI/channels/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AXI4用实例介绍 5 个读写通道
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05_AXI/handshake/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    握手机制、通道依赖性及AXI-Lite握手实例
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05_AXI/axi_lite/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    自定义 AXI-Lite 接口的 IP 及源码分析
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../async/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    异步电路分析
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#先从同步fifo说起" class="md-nav__link">
+    <span class="md-ellipsis">
+      先从同步FIFO说起
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#异步fifo介绍" class="md-nav__link">
+    <span class="md-ellipsis">
+      异步FIFO介绍
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#空满判断" class="md-nav__link">
+    <span class="md-ellipsis">
+      空满判断
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="空满判断">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#在同步fifo中怎么判断空满呢" class="md-nav__link">
+    <span class="md-ellipsis">
+      在同步FIFO中，怎么判断空满呢？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#在异步fifo中怎么判断空满呢" class="md-nav__link">
+    <span class="md-ellipsis">
+      在异步FIFO中，怎么判断空满呢？
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#跨时钟域问题" class="md-nav__link">
+    <span class="md-ellipsis">
+      跨时钟域问题
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#关于格雷码的转换" class="md-nav__link">
+    <span class="md-ellipsis">
+      关于格雷码的转换
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="关于格雷码的转换">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#二进制转格雷码" class="md-nav__link">
+    <span class="md-ellipsis">
+      二进制转格雷码
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#格雷码转二进制码" class="md-nav__link">
+    <span class="md-ellipsis">
+      格雷码转二进制码
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#代码实现异步fifo" class="md-nav__link">
+    <span class="md-ellipsis">
+      代码实现异步FIFO
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#几点思考" class="md-nav__link">
+    <span class="md-ellipsis">
+      几点思考
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#写在后面" class="md-nav__link">
+    <span class="md-ellipsis">
+      写在后面
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="数字ic面试八股文fifo相关异步fifo设计详解">【数字IC面试八股文(FIFO相关)】异步FIFO设计详解<a class="headerlink" href="#数字ic面试八股文fifo相关异步fifo设计详解" title="Permanent link">&para;</a></h1>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Version<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> linhuangnan</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> 2024-03-05 </li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> 异步FIFO设计</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> review</li>
+</ul>
+</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<ul>
+<li>先从同步FIFO说起</li>
+<li>异步FIFO介绍</li>
+<li>空满判断</li>
+<li>跨时钟域问题</li>
+<li>关于格雷码的转换</li>
+<li>代码实现异步FIFO</li>
+<li>几点思考</li>
+<li>写在后面</li>
+</ul>
+</div>
+<h2 id="先从同步fifo说起">先从同步FIFO说起<a class="headerlink" href="#先从同步fifo说起" title="Permanent link">&para;</a></h2>
+<p>同步FIFO，简单地说就是写入FIFO的时钟和读出FIFO的<strong>时钟相同</strong>的FIFO，<strong>FIFO的一个最重要的地方就是空和满的判断</strong>；</p>
+<p>对于同步FIFO来说，可以设置计数器，计数器最大值为FIFO深度，最小值为0，该计数器在写使能情况下加一，读使能情况下减一，分别代表着写入一个数据和读出一个数据；计数为0，说明读空，计数为FIFO深度，则说明写满。分别产生相应的空信号和满信号；</p>
+<p>关于上期的同步FIFO设计中，还有一个小知识点，那就是关于系统函数<code>$clog2</code>。</p>
+<p><strong>$clog2是个什么函数呢？</strong></p>
+<p>$clog2是Verilog--2005标准新增的一个系统函数，<strong>功能就是对输入整数实现以2为底取对数</strong>，其结果向上取整(如5.5取6)。有一点需要说明的是，目前Vivado2017以上的版本都是支持这个系统函数的(Quartus II不清楚 )。</p>
+<div class="admonition info">
+<p class="admonition-title">$clog2</p>
+<p><strong>1、位宽太小</strong></p>
+<p>在FPGA设计中，我们经常需要用寄存器来寄存某些“数量类”的变量，比如FIFO的深度啦、或者计数器的最大值啦；又或者输入输出信号也需要将位宽用parameter参数化以便更好的调用等。</p>
+<p>举个简单的小例子：系统频率100M（周期10ns），假设需要要求设计一个计时器计时100ns，那么需要计数次数为：100ns/10ns - 1 = 9，9这个数需要用多大位宽的寄存器表示呢？很简单，以2为底取对数就行，答案是最少4位宽。为了方便地复用这个模块，我们把计时时间参数化并放到模块外，如下：</p>
+<div class="highlight"><pre><span></span><code>```verilog
+module  counter #(
+    parameter   TIME = &#39;d10         //计时时间，单位10ns
+)(
+    input       clk_100M    ,
+    input       rst         
+);
+reg [3:0]   cnt;                    //计数器
+
+//计时器
+always@(posedge clk_100M)begin
+    if(rst)
+        cnt &lt;= 0;
+    else if(cnt == TIME - 1)
+        cnt &lt;= 0;
+    else
+        cnt &lt;= cnt + 1;
+end
+
+endmodule
+```
+</code></pre></div>
+<p>假设我们下次设计需要一个计时器的话，直接调用上面的counter模块并把TIME这个参数改成自己需要的参数就可以，这样做理论上是可以的，只是会有一个致命的隐患。不妨再假设：我现在调用了counter模块，并将TIME设置为20，以实现计时200ns的功能。当TIME  = 20这个参数传递到被例化模块后，可以发现由于cnt寄存器的位宽仅为4位，其能表示的最大值为4'b1111（即十进制下的数字15），每次其到达15后就溢出为0重新开始了，也就是说这个200ns的计时器实际上根本就计数不到200ns。</p>
+<p>这个隐患发生的原因就是在设计寄存器cnt时的位宽只有4位，无法满足“大量时间的计时任务”。</p>
+<p><strong>2、自己写一个Function</strong></p>
+<p>现在来想一下如何解决上述的位宽不匹配的问题。将寄存器的位宽设计为一个较大的数值（如固定为32bit）不失为一个不错的方法，但是如果将这条规则适用到每一个寄存器，则势必造成大量的资源浪费（你资源多你随便玩）。而且该方法指标不治本，我们需要做的是，这个寄存器应该有多大就设计多大的位宽（有多大的脚就穿多大的鞋，鞋子太大一定能穿，但你脚不一定舒服）。</p>
+<p>前面说过寄存器的位宽的计算方法：以2为底取对数。所以我们只需要设计一个Function（可综合），来实现此项功能即可。刚好在Xilinx的许多源码都出现了这个简单的Function，我们直接拿过来用就是的：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//  function 实现 </span>
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">integer</span><span class="w"> </span><span class="n">clogb2</span><span class="w"> </span><span class="p">(</span><span class="k">input</span><span class="w"> </span><span class="k">integer</span><span class="w"> </span><span class="n">bit_depth</span><span class="p">);</span><span class="w">              </span>
+<span class="w">        </span><span class="k">begin</span><span class="w">                                                           </span>
+<span class="w">            </span><span class="k">for</span><span class="p">(</span><span class="n">clogb2</span><span class="o">=</span><span class="mh">0</span><span class="p">;</span><span class="w"> </span><span class="n">bit_depth</span><span class="o">&gt;</span><span class="mh">0</span><span class="p">;</span><span class="w"> </span><span class="n">clogb2</span><span class="o">=</span><span class="n">clogb2</span><span class="o">+</span><span class="mh">1</span><span class="p">)</span><span class="w">                   </span>
+<span class="w">                </span><span class="n">bit_depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bit_depth</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span><span class="w">                                 </span>
+<span class="w">        </span><span class="k">end</span><span class="w">                                                           </span>
+<span class="w">    </span><span class="k">endfunction</span><span class="w">                                                     </span>
+
+<span class="c1">// 使用案例</span>
+<span class="w">    </span><span class="k">localparam</span><span class="w"> </span><span class="k">integer</span><span class="w"> </span><span class="n">C_TRANSACTIONS_NUM</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clogb2</span><span class="p">(</span><span class="n">C_M_AXI_BURST_LEN</span><span class="o">-</span><span class="mh">1</span><span class="p">);</span><span class="w">     </span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">C_TRANSACTIONS_NUM</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w">    </span><span class="n">write_index</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">C_TRANSACTIONS_NUM</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w">    </span><span class="n">read_index</span><span class="p">;</span>
+</code></pre></div>
+<p>上面的代码就是定义了一个求位宽的function，用其求得某类寄存器的位宽，然后再对寄存器赋值时就直接使用求得的位宽来赋值，这样复用起来就比较方便了。</p>
+<p>我们将这个代码放到上面的计数器模块中后，不管需要计数多大时间，都能计算出相匹配的寄存器位宽了。</p>
+<p><strong>3、无法在输入输出端口使用</strong></p>
+<p>自己写Function实现对2取对数的功能也有一定的局限性：无法对输入输出端口信号使用该Function。Function是定义在模块内部，所以若输入输出端口也需要根据输入的parameter参数来以2为底取对数的话此种方法就无能为力了。比如：设计一个同步FIFO，输出信号fifo_cnt（计数器）是对写入FIFO的数据进行计数的寄存器，其最大值即为FIFO的深度DATA_DEPTH ，所以fifo_cnt的位宽就需要在定义模块输入输出端口时确定，显然这无法使用自己构造的 cblogb2 Function。那该当如何？</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="c1">//计数器法实现同步FIFO</span>
+<span class="k">module</span><span class="w">  </span><span class="n">sync_fifo_cnt</span>
+<span class="p">#(</span>
+<span class="w">    </span><span class="k">parameter</span><span class="w">   </span><span class="n">DATA_WIDTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">&#39;d8</span><span class="w">  </span><span class="p">,</span><span class="w">                         </span><span class="c1">//FIFO位宽</span>
+<span class="w">    </span><span class="k">parameter</span><span class="w">   </span><span class="n">DATA_DEPTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">&#39;d16</span><span class="w">                           </span><span class="c1">//FIFO深度</span>
+<span class="p">)</span>
+<span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                                   </span><span class="n">clk</span><span class="w">     </span><span class="p">,</span><span class="w">       </span><span class="c1">//系统时钟</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                                   </span><span class="n">rst_n</span><span class="w">   </span><span class="p">,</span><span class="w">       </span><span class="c1">//低电平有效的复位信号</span>
+<span class="w">    </span><span class="k">input</span><span class="w">   </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">                </span><span class="n">data_in</span><span class="w"> </span><span class="p">,</span><span class="w">       </span><span class="c1">//写入的数据</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                                   </span><span class="n">rd_en</span><span class="w">   </span><span class="p">,</span><span class="w">       </span><span class="c1">//读使能信号，高电平有效</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                                   </span><span class="n">wr_en</span><span class="w">   </span><span class="p">,</span><span class="w">       </span><span class="c1">//写使能信号，高电平有效</span>
+
+<span class="w">    </span><span class="k">output</span><span class="w">  </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">            </span><span class="n">data_out</span><span class="p">,</span><span class="w">       </span><span class="c1">//输出的数据</span>
+<span class="w">    </span><span class="k">output</span><span class="w">                                  </span><span class="n">empty</span><span class="w">   </span><span class="p">,</span><span class="w">       </span><span class="c1">//空标志，高电平表示当前FIFO已被写满</span>
+<span class="w">    </span><span class="k">output</span><span class="w">                                  </span><span class="n">full</span><span class="w">    </span><span class="p">,</span><span class="w">       </span><span class="c1">//满标志，高电平表示当前FIFO已被读空</span>
+<span class="w">    </span><span class="k">output</span><span class="w">  </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DATA_DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w">    </span><span class="n">fifo_cnt</span><span class="w">        </span><span class="c1">//$clog2是以2为底取对数    </span>
+<span class="p">);</span>
+
+<span class="c1">//省略部分代码</span>
+
+<span class="k">endmodule</span>
+</code></pre></div>
+<p><strong>4、$clog2系统函数</strong></p>
+<p>其实办法也有，在上面的代码中也展示出来了，就是使用 <span class="arithmatex">\(clog2 这个Verilog的系统函数。\)</span>clog2是Verilog--2005标准新增的一个系统函数，功能就是对输入整数实现以2为底取对数，其结果向上取整（如5.5取6）。有一点需要说明的是，目前Vivado2017以上的版本都是支持这个系统函数的（Quartus II不清楚 ）。但是百度搜索这条结果的时候有两条结论是错误的：</p>
+<p>1、Vivado不支持$clog2系统函数</p>
+<p>2、$clog2系统函数在Vivado实现的是以e为底取对数，而不是2</p>
+</div>
+<h2 id="异步fifo介绍">异步FIFO介绍<a class="headerlink" href="#异步fifo介绍" title="Permanent link">&para;</a></h2>
+<p>异步FIFO，有两个时钟域，<strong>读FIFO时钟和写FIFO的时钟不相同</strong>；异步FIFO时钟可以用来很好的<strong>解决跨时钟域的问题</strong>，异步FIFO有哪些参数呢？如下：</p>
+<p><img alt="286" src="../../../img/286.png" /></p>
+<p>去百度异步FIFO，通常都会找到这么一张异步FIFO的结构图片，如下：</p>
+<p><img alt="46" src="../../../img/46.jpg" /></p>
+<p>第一次看到这个图，不免有些迷茫，不着急，我们先不看这个图，先从头，慢慢来：</p>
+<p>首先，这是一个FIFO的整体框图，无论同步FIFO还是异步FIFO，都适用下图：</p>
+<p><img alt="47" src="../../../img/47.jpg" /></p>
+<p>其次，从之前那个图，大致能看出，异步FIFO的结构，主要由5大模块组成</p>
+<p>①双端口RAM，或者说FIFO存储体，主要用于数据的存储。</p>
+<p>②FIFO的写入控制器；</p>
+<p>③FIFO的读出控制器；</p>
+<p>④读指针同步器，使用写时钟域的时钟对读指针打两拍，同步到写时钟域；</p>
+<p>⑤写指针同步器，使用读时钟域的时钟对写指针打两拍，同步到读时钟域；</p>
+<p>如此，便可得到一张简化版的结构图：</p>
+<p><img alt="48" src="../../../img/48.jpg" /></p>
+<p>各个模块的功能在于控制异步FIFO：</p>
+<p>①在有写使能且未写满的情况下，在写时钟域进行写操作；</p>
+<p>②在有读使能且未读空的情况下，在读时钟域进行读操作；</p>
+<h2 id="空满判断">空满判断<a class="headerlink" href="#空满判断" title="Permanent link">&para;</a></h2>
+<h3 id="在同步fifo中怎么判断空满呢">在同步FIFO中，怎么判断空满呢？<a class="headerlink" href="#在同步fifo中怎么判断空满呢" title="Permanent link">&para;</a></h3>
+<p>①使用计数器，对FIFO中的数据进行计数；这是上一期同步FIFO的方法。</p>
+<p>②通过对比读写指针，比如下面这张图：</p>
+<p><img alt="287" src="../../../img/287.png" /></p>
+<p>读写指针(即读写地址)相等时，FIFO有可能空(复位初始状态)，也有可能满(比如第五行的情形)。那该怎么判断呢？</p>
+<p>一个通常采用的做法是：</p>
+<div class="highlight"><pre><span></span><code>地址扩展一位对读写指针进行计数；
+
+读空信号：复位的时候，读指针和写指针相等，读空信号有效；当读指针赶上写指针的时候，写指针等于读指针意味着最后一个数据被读完，此时读空信号有效。
+
+写满信号：当写指针比读指针多一圈时，写指针等于读指针意味着写满了，此时写满信号有效。
+</code></pre></div>
+<p>(这个多一圈，即读指针信号比写指针信号多走了一个FIFO_DEPTH)，具体怎么理解呢？假设FIFO_DEPTH = 8；则有效的地址信号为3位，读写指针都扩展1位到4位。</p>
+<p><img alt="288" src="../../../img/288.png" /></p>
+<p>为什么不会出现第三种情况呢，因为读指针最多和写指针相等，读指针不可能比写指针多走一圈，读不可能比写快。但是写可以比读多转一圈，此时也就写满了。</p>
+<p>总结起来就是</p>
+<div class="highlight"><pre><span></span><code>读写指针相同时认为是读空
+
+当最高位不同，其余位相同时认为是写满
+</code></pre></div>
+<p>该方法适用于二进制数之间的空满比较判断。</p>
+<h3 id="在异步fifo中怎么判断空满呢">在异步FIFO中，怎么判断空满呢？<a class="headerlink" href="#在异步fifo中怎么判断空满呢" title="Permanent link">&para;</a></h3>
+<p>异步FIFO中，读指针和写指针都都分别在读时钟和写时钟下计数，这是不能直接进行比较的，想要进行比较，那就需要将指针同步到另一个时钟域。具体来说就是：</p>
+<div class="highlight"><pre><span></span><code>读指针在写时钟下，同步到写时钟域
+
+写指针在读时钟下，同步到读时钟域
+</code></pre></div>
+<p>怎么进行方便简单的同步呢？</p>
+<p>这就想到了曾经的<strong>异步信号打两拍来降低亚稳态概率</strong>的操作，但是这是<strong>单bit</strong>异步信号同步操作；<strong>要是能把多位的读写指针信号，转化成单bit变化的信号，不就可以通过打两拍的方式进行同步了嘛</strong>？</p>
+<p>那，格雷码派上用场了。</p>
+<p>读写指针可以使用格雷码进行计数，格雷码一个最大的特点就是计数加一时，所有位数只变其中一位，这就可以打两拍进行同步了。</p>
+<p>怎么对格雷码进行比大小呢？如下图：</p>
+<p><img alt="289" src="../../../img/289.png" /></p>
+<p>这就看清楚了，当二进制两个数相等时，毫无疑问，格雷码也是相同的，<strong>当二进制最高位不同(即，“多了一圈”后)，格雷码的最高位和次高位不相同，其余低位都相同。</strong></p>
+<p>加上之前判断空满的想法仍然适用，总结起来就是：</p>
+<p><strong>读写指针所有位都相同时认为是读空</strong></p>
+<p><strong>当最高位和次高位不同，其余位相同认为是写满</strong></p>
+<h2 id="跨时钟域问题">跨时钟域问题<a class="headerlink" href="#跨时钟域问题" title="Permanent link">&para;</a></h2>
+<p>上面提到了同步和异步FIFO中判断空满状态的方法，在异步FIFO中，读指针属于读时钟域，写指针属于写时钟域，肯定是不能直接进行对比指针的，即使都转化为格雷码也不能直接对比。</p>
+<p>解决方法是：两级寄存器同步+格雷码，似乎上面说过了，但是在这里再总结一下：</p>
+<p><img alt="290" src="../../../img/290.png" /></p>
+<p>现在再来看这个图，4和5这两个模块应该很清楚了。</p>
+<p>或者说，我又找到一个图，看着也比较清楚：</p>
+<p><img alt="291" src="../../../img/291.png" /></p>
+<p>设计的时候读写指针用了至少两级寄存器同步，同步会消耗至少两个时钟周期，势必会使得判断空或满有所延迟，这会不会导致设计出错呢？</p>
+<p><strong>总结来说异步逻辑转到同步逻辑不可避免需要额外的时钟开销，这会导致满空趋于保守，但是保守并不等于错误，这么写会稍微有性能损失，但是不会出错。</strong></p>
+<h2 id="关于格雷码的转换">关于格雷码的转换<a class="headerlink" href="#关于格雷码的转换" title="Permanent link">&para;</a></h2>
+<h4 id="二进制转格雷码">二进制转格雷码<a class="headerlink" href="#二进制转格雷码" title="Permanent link">&para;</a></h4>
+<p>转换规则是：(1)最高位保留不变；(2)格雷码其余位为二进制码对应位与其前一位的异或。</p>
+<p>用代码表述就是</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//二进制码B[n:0],格雷码G[n:0];</span>
+<span class="n">G</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">n</span><span class="p">];</span><span class="c1">//最高位不变</span>
+<span class="n">G</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">n</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">1</span><span class="p">];</span>
+</code></pre></div>
+<p><img alt="292" src="../../../img/292.png" /></p>
+<p>当然了，还有一种更简单的方法：移位法。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//二进制码B[n:0],格雷码G[n:0];</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">gray_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">binary_value</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="p">(</span><span class="n">binary_value</span><span class="o">&gt;&gt;</span><span class="mh">1</span><span class="p">);</span>
+</code></pre></div>
+<h4 id="格雷码转二进制码">格雷码转二进制码<a class="headerlink" href="#格雷码转二进制码" title="Permanent link">&para;</a></h4>
+<p>转换规则是：(1)最高位保留不变；(2)其余位格雷码与二进制对应位的前一位相异或，得到二进制的对应位。</p>
+<p>代码表述就是：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//格雷码G[n:0],二进制码B[n:0];</span>
+<span class="n">B</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="p">[</span><span class="n">n</span><span class="p">];</span>
+<span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="p">]</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">];(</span><span class="mh">1</span><span class="o">&lt;=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+</code></pre></div>
+<p><img alt="293" src="../../../img/293.png" /></p>
+<p>用Verilog代码实现如下：</p>
+<div class="highlight"><pre><span></span><code><span class="k">module</span><span class="w"> </span><span class="n">gray2bin</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">4</span>
+<span class="p">)(</span>
+<span class="w">  </span><span class="k">input</span><span class="w"> </span><span class="p">[</span><span class="n">N</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">gray</span><span class="p">,</span>
+<span class="w">  </span><span class="k">output</span><span class="w"> </span><span class="p">[</span><span class="n">N</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">bin</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="w">  </span><span class="k">assign</span><span class="w"> </span><span class="n">bin</span><span class="p">[</span><span class="n">N</span><span class="o">-</span><span class="mh">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gray</span><span class="p">[</span><span class="n">N</span><span class="o">-</span><span class="mh">1</span><span class="p">];</span>
+<span class="w">  </span><span class="k">genvar</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">  </span><span class="k">generate</span>
+<span class="w">  </span><span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="o">-</span><span class="mh">2</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span><span class="o">:</span><span class="w"> </span><span class="n">gray_2_bin</span>
+<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">bin</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bin</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="p">]</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">gray</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="w">  </span><span class="k">endgenerate</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+<p>不过，异步FIFO中并没有用到格雷码转二进制码。</p>
+<h2 id="代码实现异步fifo">代码实现异步FIFO<a class="headerlink" href="#代码实现异步fifo" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="k">module</span><span class="w"> </span><span class="n">asy_fifo</span><span class="p">#(</span>
+<span class="w">    </span><span class="k">parameter</span><span class="w">   </span><span class="n">WIDTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">8</span><span class="p">,</span>
+<span class="w">    </span><span class="k">parameter</span><span class="w">   </span><span class="n">DEPTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">8</span>
+<span class="p">)(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">   </span><span class="p">[</span><span class="n">WIDTH</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">wr_data</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                   </span><span class="n">wr_clk</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                   </span><span class="n">wr_rstn</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                   </span><span class="n">wr_en</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                   </span><span class="n">rd_clk</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                   </span><span class="n">rd_rstn</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w">                   </span><span class="n">rd_en</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w">                  </span><span class="n">fifo_full</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w">                  </span><span class="n">fifo_empty</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w">  </span><span class="p">[</span><span class="n">WIDTH</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">rd_data</span>
+<span class="p">);</span>
+<span class="w">    </span><span class="c1">//定义读写指针</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w">  </span><span class="n">wr_ptr</span><span class="p">,</span><span class="w"> </span><span class="n">rd_ptr</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">//定义一个宽度为WIDTH，深度为DEPTH的fifo</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">WIDTH</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">fifo</span><span class="w">    </span><span class="p">[</span><span class="n">DEPTH</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">//定义读数据</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">WIDTH</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">rd_data</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">//写操作</span>
+<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="p">(</span><span class="k">posedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">wr_rstn</span><span class="p">)</span>
+<span class="w">            </span><span class="n">wr_ptr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">wr_en</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">fifo_full</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">fifo</span><span class="p">[</span><span class="n">wr_ptr</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">wr_data</span><span class="p">;</span>
+<span class="w">            </span><span class="n">wr_ptr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">wr_ptr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="n">wr_ptr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">wr_ptr</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="c1">//读操作</span>
+<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="p">(</span><span class="k">posedge</span><span class="w"> </span><span class="n">rd_clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">rd_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">rd_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">rd_ptr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">rd_data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">rd_en</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">fifo_empty</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">rd_data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">fifo</span><span class="p">[</span><span class="n">rd_ptr</span><span class="p">];</span>
+<span class="w">            </span><span class="n">rd_ptr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">rd_ptr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="n">rd_ptr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">rd_ptr</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="c1">//定义读写指针格雷码</span>
+<span class="w">    </span><span class="kt">wire</span><span class="w"> </span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">wr_ptr_g</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">wire</span><span class="w"> </span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">rd_ptr_g</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">//读写指针转换成格雷码</span>
+<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">wr_ptr_g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wr_ptr</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="p">(</span><span class="n">wr_ptr</span><span class="w"> </span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="mh">1</span><span class="p">);</span>
+<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">rd_ptr_g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rd_ptr</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="p">(</span><span class="n">rd_ptr</span><span class="w"> </span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="mh">1</span><span class="p">);</span>
+
+
+<span class="w">    </span><span class="c1">//定义打拍延迟格雷码</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">wr_ptr_gr</span><span class="p">,</span><span class="w"> </span><span class="n">wr_ptr_grr</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">rd_ptr_gr</span><span class="p">,</span><span class="w"> </span><span class="n">rd_ptr_grr</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">//写指针同步到读时钟域</span>
+<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="p">(</span><span class="k">posedge</span><span class="w"> </span><span class="n">rd_clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">rd_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">rd_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">wr_ptr_gr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">wr_ptr_grr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">wr_ptr_gr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">wr_ptr_g</span><span class="p">;</span>
+<span class="w">            </span><span class="n">wr_ptr_grr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">wr_ptr_gr</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="c1">//读指针同步到写时钟域</span>
+<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="p">(</span><span class="k">posedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">wr_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">rd_ptr_gr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">rd_ptr_grr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">rd_ptr_gr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">rd_ptr_g</span><span class="p">;</span>
+<span class="w">            </span><span class="n">rd_ptr_grr</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">rd_ptr_gr</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="c1">//声明空满信号数据类型</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="n">fifo_full</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="n">fifo_empty</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">//写满判断</span>
+<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="p">(</span><span class="k">posedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">wr_rstn</span><span class="p">)</span>
+<span class="w">            </span><span class="n">fifo_full</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">((</span><span class="n">wr_ptr_g</span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">rd_ptr_grr</span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)])</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">wr_ptr_g</span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">rd_ptr_grr</span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="p">])</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">wr_ptr_g</span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">2</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">rd_ptr_grr</span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">2</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]))</span>
+<span class="w">            </span><span class="n">fifo_full</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="n">fifo_full</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="c1">//读空判断</span>
+<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">@</span><span class="w"> </span><span class="p">(</span><span class="k">posedge</span><span class="w"> </span><span class="n">rd_clk</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">negedge</span><span class="w"> </span><span class="n">rd_rstn</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">rd_rstn</span><span class="p">)</span>
+<span class="w">            </span><span class="n">fifo_empty</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">wr_ptr_grr</span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">rd_ptr_g</span><span class="p">[</span><span class="n">$clog2</span><span class="p">(</span><span class="n">DEPTH</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">])</span>
+<span class="w">            </span><span class="n">fifo_empty</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="n">fifo_empty</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">endmodule</span>
+</code></pre></div>
+<p>测试文件
+<div class="highlight"><pre><span></span><code><span class="k">module</span><span class="w"> </span><span class="n">asy_fifo_tb</span><span class="p">;</span>
+<span class="w">    </span><span class="k">parameter</span><span class="w">   </span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">8</span><span class="p">;</span>
+<span class="w">    </span><span class="k">parameter</span><span class="w">   </span><span class="n">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">8</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="n">wr_clk</span><span class="p">,</span><span class="w"> </span><span class="n">wr_en</span><span class="p">,</span><span class="w"> </span><span class="n">wr_rstn</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="n">rd_clk</span><span class="p">,</span><span class="w"> </span><span class="n">rd_en</span><span class="p">,</span><span class="w"> </span><span class="n">rd_rstn</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">width</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">wr_data</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">wire</span><span class="w"> </span><span class="n">fifo_full</span><span class="p">,</span><span class="w"> </span><span class="n">fifo_empty</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">wire</span><span class="w"> </span><span class="p">[</span><span class="n">width</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">rd_data</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">//实例化</span>
+<span class="w">        </span><span class="n">asy_fifo</span><span class="w"> </span><span class="n">myfifo</span><span class="w"> </span><span class="p">(</span>
+<span class="w">            </span><span class="p">.</span><span class="n">wr_clk</span><span class="p">(</span><span class="n">wr_clk</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">rd_clk</span><span class="p">(</span><span class="n">rd_clk</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">wr_rstn</span><span class="p">(</span><span class="n">wr_rstn</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">rd_rstn</span><span class="p">(</span><span class="n">rd_rstn</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">wr_en</span><span class="p">(</span><span class="n">wr_en</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">rd_en</span><span class="p">(</span><span class="n">rd_en</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">wr_data</span><span class="p">(</span><span class="n">wr_data</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">rd_data</span><span class="p">(</span><span class="n">rd_data</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">fifo_empty</span><span class="p">(</span><span class="n">fifo_empty</span><span class="p">),</span>
+<span class="w">            </span><span class="p">.</span><span class="n">fifo_full</span><span class="p">(</span><span class="n">fifo_full</span><span class="p">)</span>
+<span class="w">        </span><span class="p">);</span>
+<span class="w">    </span><span class="c1">//时钟</span>
+<span class="w">    </span><span class="k">initial</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">rd_clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">forever</span><span class="w"> </span><span class="p">#</span><span class="mh">25</span><span class="w"> </span><span class="n">rd_clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">rd_clk</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="k">initial</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">wr_clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">forever</span><span class="w"> </span><span class="p">#</span><span class="mh">30</span><span class="w"> </span><span class="n">wr_clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">wr_clk</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="c1">//赋值</span>
+<span class="w">    </span><span class="k">initial</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">wr_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">rd_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">wr_rstn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">rd_rstn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">#</span><span class="mh">10</span><span class="p">;</span>
+<span class="w">        </span><span class="n">wr_rstn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">rd_rstn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">#</span><span class="mh">20</span><span class="p">;</span>
+<span class="w">        </span><span class="n">wr_rstn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">rd_rstn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="p">)</span>
+<span class="w">        </span><span class="n">wr_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nb">$random</span><span class="p">}</span><span class="o">%</span><span class="mh">30</span><span class="p">;</span>
+<span class="w">        </span><span class="n">wr_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">repeat</span><span class="p">(</span><span class="mh">7</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="p">)</span>
+<span class="w">            </span><span class="n">wr_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nb">$random</span><span class="p">}</span><span class="o">%</span><span class="mh">30</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+
+<span class="w">        </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="p">)</span>
+<span class="w">        </span><span class="n">wr_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">rd_clk</span><span class="p">)</span>
+<span class="w">        </span><span class="n">rd_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">repeat</span><span class="p">(</span><span class="mh">7</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">rd_clk</span><span class="p">);</span>
+<span class="w">        </span><span class="k">end</span>
+
+<span class="w">        </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">rd_clk</span><span class="p">)</span>
+<span class="w">        </span><span class="n">rd_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">        </span><span class="p">#</span><span class="mh">150</span><span class="p">;</span>
+<span class="w">        </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="p">)</span>
+<span class="w">        </span><span class="n">wr_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">wr_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nb">$random</span><span class="p">}</span><span class="o">%</span><span class="mh">30</span><span class="p">;</span>
+<span class="w">        </span><span class="k">repeat</span><span class="p">(</span><span class="mh">15</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="p">)</span>
+<span class="w">            </span><span class="n">wr_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nb">$random</span><span class="p">}</span><span class="o">%</span><span class="mh">30</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="p">@(</span><span class="k">negedge</span><span class="w"> </span><span class="n">wr_clk</span><span class="p">)</span>
+<span class="w">        </span><span class="n">wr_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">#</span><span class="mh">50</span><span class="p">;</span>
+<span class="w">        </span><span class="nb">$finish</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="k">endmodule</span>
+</code></pre></div></p>
+<p>仿真截图</p>
+<p><img alt="294" src="../../../img/294.png" /></p>
+<p>整体仿真图如上图所示，我们来慢慢的分析一下；</p>
+<p><img alt="295" src="../../../img/295.png" /></p>
+<p><img alt="296" src="../../../img/296.png" /></p>
+<p>另一边满信号拉低和空信号拉高也是同样的分析方法；</p>
+<p>大致上，异步FIFO的设计思路以及基本功能算是实现了。</p>
+<h2 id="几点思考">几点思考<a class="headerlink" href="#几点思考" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p>其实异步FIFO的设计有比较多具体的实现形式，空满判断时可以使用组合逻辑，那么仿真结果又和上图不一样了。</p>
+</li>
+<li>
+<p>出现空或满状态后也可以强行拉低外部写入或读取使能，从FIFO自身就限制不让数据写入，当然，这个功能可以在FIFO之外用逻辑电路实现。</p>
+</li>
+<li>
+<p>此次仿真文件中，假设rd_clk比wr_clk快，通过打两拍同步的方式，慢时钟域同步到快时钟域和快时钟域同步到慢时钟域处理方式是不同的，后面有机会再详细说明(主要是我还没有学到)。</p>
+</li>
+<li>
+<p>如果跨时钟域同步时，同步过来的是一个亚稳态的数据，那么FIFO还能否正常工作呢？</p>
+</li>
+</ul>
+<p>这个问题大概就是，同步过程中格雷码出现了错误情况，因为格雷码每次变化一位，那么传输过程中就算出错最多也是一位数据出错，此时相当于指针信号没有发生变化。</p>
+<p>如果是写指针同步失效，用这个错误的写指针在读时钟域进行空判断最多是让空标志在FIFO不是真正空的时候产生，而不会产生空读的情况。</p>
+<p>在读指针同步失效时也是一样的道理。</p>
+<p>格雷码保证的是同步后的读写地址即使在出错的情况下依然能够保证FIFO功能的正确性。</p>
+<p><strong>注意</strong>: 上述1bit数据不一致的情况只限于相邻两次跳变之间，假若超过两个周期，情况就不一定了。因此，地址总线的bus skew一定不能超过一个周期，否则可能出现gray码多位数据跳变的情况。</p>
+<ul>
+<li>
+<p>不同位宽的异步FIFO应该怎么设计呢？又该需要考虑哪些注意事项呢？</p>
+</li>
+<li>
+<p>关于异步FIFO的设计深度相关问题，后续有机会再做讨论。</p>
+</li>
+</ul>
+<h2 id="写在后面">写在后面<a class="headerlink" href="#写在后面" title="Permanent link">&para;</a></h2>
+<p>当然了，我们学习异步FIFO的设计，主要目的是为了掌握其工作机制和原理，而并不是真的在实际工程中用自己设计的异步FIFO，毕竟各大厂商都有自己的FIFO IP核可以调用，他们的设计远比我们设计出来的更稳定、功能更丰富。</p>
+
+
+
+
+
+
+
+
+  <aside class="md-source-file">
+    
+    
+    
+      
+  
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Contributors">
+      
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
+      
+    </span>
+    <nav>
+      
+        <a href="mailto:670788440@qq.com">lhn</a>
+    </nav>
+  </span>
+
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2020 - 2024 huangnan.lin
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/LinHuangnan/something" target="_blank" rel="noopener" title="From that day on, if I was going somewhere, I was running." class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.tabs", "navigation.indexes", "navigation.tabs.sticky", "navigation.sections", "header.autohide"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+        <script src="../../../javascripts/config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
